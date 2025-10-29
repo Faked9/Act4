@@ -1,1 +1,23 @@
+name: GitHub Projects Automation
+
+on:
+  pull_request:
+    types: [closed]   # Trigger when a pull request is closed
+
+jobs:
+  move-issue-to-done:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true   # Only run if the PR was merged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Move related issue to Done column
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }} \
+            -d '{"state": "closed"}'
 
